@@ -10,7 +10,7 @@ app.use((_req: Request, _res: Response, _next: NextFunction)=>{
     throw new Error('This method / route does not exist!');
 });
 
-app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+app.use((error: Error, _req: Request, res: Response, next: NextFunction) => {
     if(res.headersSent) {
         return next(error);
     }
