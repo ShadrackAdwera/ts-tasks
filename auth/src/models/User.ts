@@ -33,7 +33,7 @@ const userSchema = new Schema({
     resetToken: { type: String },
     tokenExpirationDate: { type: Date },
     roles: [ { type: String, enum: Object.keys(userRoles), default: userRoles.User } ]
-});
+}, { timestamps: true, toJSON: { getters: true } } );
 
 userSchema.set('versionKey', 'version');
 userSchema.plugin(updateIfCurrentPlugin);
