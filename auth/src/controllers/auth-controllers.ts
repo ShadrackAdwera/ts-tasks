@@ -9,22 +9,6 @@ import jwt from 'jsonwebtoken';
 import { User } from '../models/User';
 import { Company } from '../models/Company';
 
-interface UserAttributes extends Document {
-    username: string;
-    email: string;
-    password: string;
-    company: {
-        name: string;
-    } | string;
-    roles?: string[];
-    resetToken?: string,
-    tokenExpirationDate?: Date,
-}
-
-interface CompanyAttributes extends Document {
-    name: string
-}
-
 // to compare company name(s)
 const compareStrings = (requestCompanyName: string, dbCompanyName: string) => {
     return requestCompanyName.trim().toLocaleLowerCase().split(' ').join('-') === dbCompanyName.trim().toLocaleLowerCase().split(' ').join('-');
@@ -35,8 +19,8 @@ const signUp = async(req: Request, res: Response, next: NextFunction) => {
     if(!error.isEmpty()) {
         return next(new HttpError('Invalid inputs', 422));
     }
-    let foundUser: UserAttributes;
-    let foundCompany: CompanyAttributes;
+    let foundUser;
+    let foundCompany;
     let hashedPassword: string;
     let token: string;
     const { username, email, password, company } = req.body;
@@ -57,10 +41,11 @@ const signUp = async(req: Request, res: Response, next: NextFunction) => {
         return next(new HttpError('An error occured, try again', 500));
     }
 
-    const companyNameResult = compareStrings(company, foundCompany.name);
-
-    if(companyNameResult) {
-        return next(new HttpError('This company name is taken', 422));
+    if(foundCompany) {
+        const companyNameResult = compareStrings(company, foundCompany.name);
+        if(companyNameResult) {
+            return next(new HttpError('This company name is taken', 422));
+        }
     }
 
     //create company in DB and publish event to company service
@@ -98,7 +83,7 @@ const signUp = async(req: Request, res: Response, next: NextFunction) => {
     }
 
     try {
-        token = await jwt.sign( { id: newUser.id, email }, process.env.JWT_KEY, { expiresIn: '1h' });    
+        token = await jwt.sign( { id: newUser.id, email }, process.env.JWT_KEY!, { expiresIn: '1h' });    
     } catch (error) {
         return next(new HttpError('An error occured, try again', 500));
     }
@@ -112,7 +97,7 @@ const login = async(req: Request, res: Response, next: NextFunction) => {
     if(!error.isEmpty()) {
         return next(new HttpError('Invalid inputs', 422));
     }
-    let foundUser: UserAttributes;
+    let foundUser;
     let isPassword: boolean;
     let token: string;
     const { email, password } = req.body;
@@ -140,7 +125,7 @@ const login = async(req: Request, res: Response, next: NextFunction) => {
 
     //generate token
     try {
-        token = await jwt.sign( { id: foundUser.id, email: foundUser.email }, process.env.JWT_KEY, { expiresIn: '1h' });    
+        token = await jwt.sign( { id: foundUser.id, email: foundUser.email }, process.env.JWT_KEY!, { expiresIn: '1h' });    
     } catch (error) {
         return next(new HttpError('An error occured, try again', 500));
     }
@@ -151,7 +136,7 @@ const login = async(req: Request, res: Response, next: NextFunction) => {
 
 const requestPasswordReset = async(req: Request, res: Response, next: NextFunction) => {
     const { email } = req.body;
-    let foundUser: UserAttributes;
+    let foundUser;
 
     const error = validationResult(req);
     if(!error.isEmpty()) {
@@ -180,7 +165,7 @@ const requestPasswordReset = async(req: Request, res: Response, next: NextFuncti
 const resetPassword = async(req: Request, res: Response, next: NextFunction) => {
     const { password, confirmPassword } = req.body;
     const { resetToken } = req.params;
-    let foundUser: UserAttributes;
+    let foundUser;
     let hashedPassword: string;
 
     const error = validationResult(req);
@@ -212,7 +197,7 @@ const resetPassword = async(req: Request, res: Response, next: NextFunction) => 
     }
     foundUser.password = hashedPassword;
     foundUser.tokenExpirationDate = undefined;
-    foundUser.resetToken = null;
+    foundUser.resetToken = undefined;
 
     try {
         await foundUser.save();
