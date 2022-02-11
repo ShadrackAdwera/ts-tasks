@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 import { app } from './app';
 
-if(!process.env.JWT) {
+if(!process.env.JWT_KEY) {
     throw new Error('JWT is not defined!');
 }
 

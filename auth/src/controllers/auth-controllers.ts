@@ -1,3 +1,4 @@
+import brypto from 'crypto';
 import { HttpError } from '@adwesh/common';
 import { Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
@@ -16,6 +17,8 @@ interface UserAttributes extends Document {
         name: string;
     } | string;
     roles?: string[];
+    resetToken?: string,
+    tokenExpirationDate?: Date,
 }
 
 interface CompanyAttributes extends Document {
@@ -146,5 +149,78 @@ const login = async(req: Request, res: Response, next: NextFunction) => {
     res.status(201).json({message: 'Login Successful', user: { id: foundUser.id, email, token, roles: foundUser.roles }})
 }
 
+const requestPasswordReset = async(req: Request, res: Response, next: NextFunction) => {
+    const { email } = req.body;
+    let foundUser: UserAttributes;
 
+    const error = validationResult(req);
+    if(!error.isEmpty()) {
+        return next(new HttpError('Invalid email', 422));
+    }
 
+    // check if user exists in DB
+    try {
+        foundUser = await User.findOne({email}).exec();
+    } catch (error) {
+        return next(new HttpError('An error occured, try again', 500));
+    }
+
+    if(!foundUser) {
+        return next(new HttpError('This account does not exist', 400));
+    }
+    const resetTkn = brypto.randomBytes(64).toString('hex');
+    const resetDate = new Date(Date.now() + 3600000);
+    foundUser.resetToken = resetTkn;
+    foundUser.tokenExpirationDate = resetDate;
+
+    //TODO: Send email with reset link to user : https://my-frontend-url/reset-token/${resetTkn}
+    res.status(200).json({message: 'Check your email for a reset email link'});
+}
+
+const resetPassword = async(req: Request, res: Response, next: NextFunction) => {
+    const { password, confirmPassword } = req.body;
+    const { resetToken } = req.params;
+    let foundUser: UserAttributes;
+    let hashedPassword: string;
+
+    const error = validationResult(req);
+    if(!error.isEmpty()) {
+        return next(new HttpError('Invalid email', 422));
+    }
+
+    //check if passwords match
+    if(password !== confirmPassword) {
+        return next(new HttpError('The passwords do not match', 422));
+    }
+
+    // check if user exists in DB
+    try {
+        foundUser = await User.findOne({resetToken, tokenExpirationDate: { $gt: Date.now() }}).exec();
+    } catch (error) {
+        return next(new HttpError('An error occured, try again', 500));
+    }
+
+    if(!foundUser) {
+        return next(new HttpError('The password reset request is invalid', 400));
+    }  
+
+    // hash new password
+    try {
+        hashedPassword = await bcrypt.hash(password, 12);
+    } catch (error) {
+        return next(new HttpError('An error occured, try again', 500));
+    }
+    foundUser.password = hashedPassword;
+    foundUser.tokenExpirationDate = undefined;
+    foundUser.resetToken = null;
+
+    try {
+        await foundUser.save();
+    } catch (error) {
+        return next(new HttpError('An error occured, try again', 500));
+    }
+
+    res.status(200).json({message: 'Password reset successful'});
+ }
+
+ export { signUp, login, requestPasswordReset, resetPassword };
