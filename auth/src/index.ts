@@ -7,12 +7,12 @@ if(!process.env.JWT_KEY) {
 }
 
 if(!process.env.MONGO_URI) {
-    throw new Error('Mongo Uri is not defined!');
+    throw new Error('MONGO URI is not defined!');
 }
 
 const start = async() => {
     try {
-        await mongoose.connect(process.env.MONGO_URL);
+        await mongoose.connect(process.env.MONGO_URI!);
         app.listen(5000);
         console.log('Connected to Auth Service, listening on PORT: 5000');
     } catch (error) {

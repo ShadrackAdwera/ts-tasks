@@ -1,10 +1,14 @@
 import express, { Request, Response, NextFunction } from 'express';
+import { authRouter } from './routes/auth-routes';
+
 
 const app = express();
 
 app.use(express.json());
 
 //CORS
+
+app.use('/api/auth', authRouter);
 
 app.use((_req: Request, _res: Response, _next: NextFunction)=>{
     throw new Error('This method / route does not exist!');
