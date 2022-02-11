@@ -8,7 +8,7 @@ interface UserDoc extends Document {
     username: string;
     email: string;
     password: string;
-    section: string;
+    company: string;
     roles: string[];
     version: number;
 }
@@ -17,7 +17,7 @@ interface UserModel extends Model<UserDoc> {
     username: string;
     email: string;
     password: string;
-    section: string;
+    company: string;
     roles: string[];
 }
 
