@@ -29,7 +29,7 @@ const userSchema = new Schema({
     username: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, required: true, min: 6 },
-    company: { type: Schema.Types.ObjectId, required: true },
+    company: { type: Schema.Types.ObjectId, required: true, ref: 'company' },
     resetToken: { type: String },
     tokenExpirationDate: { type: Date },
     roles: [ { type: String, enum: Object.keys(userRoles), default: userRoles.User } ]
