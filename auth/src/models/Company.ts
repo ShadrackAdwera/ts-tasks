@@ -11,7 +11,7 @@ interface CompanyModel extends Model<CompanyDoc> {
 
 const companySchema = new Schema({
     name: { type: String, required: true }
-});
+}, { timestamps: true, toJSON: { getters: true } });
 
 const Company = mongoose.model<CompanyDoc, CompanyModel>('company', companySchema);
 
