@@ -9,6 +9,8 @@ interface UserDoc extends Document {
     email: string;
     password: string;
     company: string;
+    resetToken?: string,
+    tokenExpirationDate?: Date,
     roles: string[];
     version: number;
 }
@@ -18,14 +20,18 @@ interface UserModel extends Model<UserDoc> {
     email: string;
     password: string;
     company: string;
+    resetToken?: string;
+    tokenExpirationDate?: Date;
     roles: string[];
 }
 
 const userSchema = new Schema({
     username: { type: String, required: true },
     email: { type: String, required: true },
-    password: { type: String, required: true },
+    password: { type: String, required: true, min: 6 },
     company: { type: Schema.Types.ObjectId, required: true },
+    resetToken: { type: String },
+    tokenExpirationDate: { type: Date },
     roles: [ { type: String, enum: Object.keys(userRoles), default: userRoles.User } ]
 });
 
