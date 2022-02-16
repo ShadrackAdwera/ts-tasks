@@ -34,3 +34,18 @@ const getCategories = async(req: Request, res: Response, next: NextFunction) => 
     }
     res.status(200).json({totalCategories: categories.length, categories});
 }
+
+const getCategoryById = async(req: Request, res: Response, next: NextFunction) => {
+    const categoryId = req.params?.id;
+    let foundCategory;
+
+    try {
+        foundCategory = Category.findById(categoryId).exec();
+    } catch (error) {
+        return next(new HttpError('An error occured, try again', 500));
+    }
+    if(!foundCategory) {
+        return next(new HttpError('This category does not exist!', 404));
+    }
+    res.status(200).json({category: foundCategory});
+}
