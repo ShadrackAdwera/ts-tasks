@@ -40,7 +40,7 @@ const getCategoryById = async(req: Request, res: Response, next: NextFunction) =
     let foundCategory;
 
     try {
-        foundCategory = Category.findById(categoryId).exec();
+        foundCategory = await Category.findById(categoryId).exec();
     } catch (error) {
         return next(new HttpError('An error occured, try again', 500));
     }
@@ -49,3 +49,36 @@ const getCategoryById = async(req: Request, res: Response, next: NextFunction) =
     }
     res.status(200).json({category: foundCategory});
 }
+
+const updateCategory = async(req: Request, res: Response, next: NextFunction) => {
+    const error = validationResult(req);
+    if(!error.isEmpty()) {
+        return next(new HttpError('Invalid inputs', 422));
+    }
+    const categoryId = req.params?.id;
+    const { title, description, priority } = req.body;
+    let foundCategory;
+
+    try {
+        foundCategory = await Category.findById(categoryId).exec();
+    } catch (error) {
+        return next(new HttpError('An error occured, try again', 500));
+    }
+    if(!foundCategory) {
+        return next(new HttpError('This category does not exist!', 404));
+    }
+    foundCategory.title = title;
+    foundCategory.description = description;
+    foundCategory.priority = priority;
+
+    try {
+        await foundCategory.save();
+    } catch (error) {
+        return next(new HttpError('An error occured, try again', 500));
+    }
+    //publish an event to tasks service
+    res.status(200).json({message: 'Update Successful', category: foundCategory});
+
+}
+
+export { createCategory, getCategories, getCategoryById, updateCategory };
