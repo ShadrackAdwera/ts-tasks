@@ -19,3 +19,5 @@ router.patch('/:id', [
     body('description').trim().not().isEmpty(),
     body('priority').trim().not().isEmpty(),
 ], updateCategory);
+
+export { router as categoryRoutes };
