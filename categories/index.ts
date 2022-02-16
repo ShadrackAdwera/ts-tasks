@@ -15,6 +15,7 @@ const startUp = async() => {
     try {
         await mongoose.connect(process.env.MONGO_URI!);
         app.listen(5001);
+        console.log('Connected to Categories DB listening on PORT: 5001');
     } catch (error) {
         console.log(error);
     }
