@@ -23,3 +23,14 @@ const createCategory = async(req: Request, res: Response, next: NextFunction) =>
     }
     res.status(201).json({message: 'Category created', category: newCategory});
 }
+
+const getCategories = async(req: Request, res: Response, next: NextFunction) => {
+    let categories;
+
+    try {
+        categories = await Category.find().exec();
+    } catch (error) {
+        return next(new HttpError('An error occured, try again', 500));
+    }
+    res.status(200).json({totalCategories: categories.length, categories});
+}
