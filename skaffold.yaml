@@ -16,5 +16,13 @@ build:
         manual:
           - dest: .
             src: 'src/**/*.ts'
+    - image: adwera/tasks-category
+      context: category
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - dest: .
+            src: 'src/**/*.ts'
     
   
