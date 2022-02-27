@@ -4,11 +4,13 @@ import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 interface SectionDoc extends Document {
     name: string;
     createdBy: string;
+    sectionId: string;
     version: number;
 }
 
 interface SectionModel extends Model<SectionDoc> {
     name: string;
+    sectionId: string;
     createdBy: string;
 }
 
