@@ -2,10 +2,11 @@ import brypto from 'crypto';
 import { HttpError } from '@adwesh/common';
 import { Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
-import { Document } from 'mongoose';
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken';
 
+import { natsWraper } from '../../natsWrapper';
+import { SectionPublisher } from '../events/publishers/section-publisher';
 import { User } from '../models/User';
 import { Company } from '../models/Company';
 
@@ -54,6 +55,7 @@ const signUp = async(req: Request, res: Response, next: NextFunction) => {
     });
     try {
         await newCompany.save();
+        await new SectionPublisher(natsWraper.client).publish({ id: newCompany.id, title: newCompany.name });
     } catch (error) {
         return next(new HttpError('An error occured, try again', 500));
     }
