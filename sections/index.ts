@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 
 import { app } from './app';
 import { natsWraper } from '@adwesh/common';
+import { SectionCreatedListener } from './src/events/section-created-listener';
 
 if(!process.env.JWT_KEY) {
     throw new Error('JWT is not defined!');
@@ -35,6 +36,8 @@ const start = async() => {
 
         process.on('SIGINT', () => natsWraper.client.close());
         process.on('SIGTERM', () => natsWraper.client.close());
+
+        new SectionCreatedListener(natsWraper.client).listen();
 
         await mongoose.connect(process.env.MONGO_URI!);
         app.listen(5002);
