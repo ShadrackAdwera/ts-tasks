@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: section-mongo-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: section-mongo
+  template:
+    metadata:
+      labels:
+        app: section-mongo
+    spec:
+      containers:
+        - name: section-mongo
+          image: mongo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: section-mongo-service
+spec:
+  selector:
+    app: section-mongo
+  ports:
+    - name: db
+      protocol: TCP
+      port: 27017
+      targetPort: 27017
