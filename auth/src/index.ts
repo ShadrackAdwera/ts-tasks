@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 import { app } from './app';
-import { natsWraper } from '../natsWrapper';
+import { natsWraper } from '@adwesh/common';
 
 if(!process.env.JWT_KEY) {
     throw new Error('JWT is not defined!');

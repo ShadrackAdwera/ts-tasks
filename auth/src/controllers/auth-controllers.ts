@@ -2,10 +2,10 @@ import brypto from 'crypto';
 import { HttpError } from '@adwesh/common';
 import { Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
+import { natsWraper } from '@adwesh/common';
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken';
 
-import { natsWraper } from '../../natsWrapper';
 import { SectionCreatedPublisher } from '../events/publishers/section-created-publisher';
 import { User } from '../models/User';
 import { Company } from '../models/Company';
