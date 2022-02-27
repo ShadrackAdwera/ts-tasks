@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 import { app } from './app';
 import { natsWraper } from '@adwesh/common';
-import { SectionCreatedListener } from './src/events/section-created-listener';
+import { SectionCreatedListener } from './events/section-created-listener';
 
 if(!process.env.JWT_KEY) {
     throw new Error('JWT is not defined!');
@@ -41,7 +41,7 @@ const start = async() => {
 
         await mongoose.connect(process.env.MONGO_URI!);
         app.listen(5002);
-        console.log('Connected to Auth Service, listening on PORT: 5000');
+        console.log('Connected to Sections Service, listening on PORT: 5002');
     } catch (error) {
         console.log(error);
     }

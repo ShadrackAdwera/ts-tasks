@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { HttpError } from '@adwesh/common';
 
-import { sectionRouter } from './src/routes/section-routes';
+import { sectionRouter } from './routes/section-routes';
 
 const app = express();
 
