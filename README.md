@@ -3,7 +3,7 @@ Assign tasks to specific users based on their user roles using priority scheduli
 
 ## SERVICES
 - Auth
-- Company
+- Section
 - Categories
 - Tasks
 - Scheduler 
