@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken';
 
 import { natsWraper } from '../../natsWrapper';
-import { SectionPublisher } from '../events/publishers/section-publisher';
+import { SectionCreatedPublisher } from '../events/publishers/section-created-publisher';
 import { User } from '../models/User';
 import { Company } from '../models/Company';
 
@@ -57,7 +57,6 @@ const signUp = async(req: Request, res: Response, next: NextFunction) => {
     });
     try {
         await newCompany.save();
-        await new SectionPublisher(natsWraper.client).publish({ id: newCompany.id, title: newCompany.name });
     } catch (error) {
         return next(new HttpError('An error occured, try again', 500));
     }
@@ -89,7 +88,7 @@ const signUp = async(req: Request, res: Response, next: NextFunction) => {
     try {
         newCompany.createdBy = newUser.id;
         await newCompany.save();
-        // TODO: Publish section updated event to sections service.
+        await new SectionCreatedPublisher(natsWraper.client).publish({ id: newCompany.id, title: newCompany.name, createdBy: newUser.id });
     } catch (error) {
         return next(new HttpError('An error occured, try again', 500));
     }

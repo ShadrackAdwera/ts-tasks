@@ -21,7 +21,7 @@
   "homepage": "https://github.com/ShadrackAdwera/ts-tasks#readme",
   "dependencies": {
     "@adwesh/common": "^1.0.18",
-    "@adwesh/v2-common": "^1.0.6",
+    "@adwesh/v2-common": "^1.0.9",
     "@types/bcryptjs": "^2.4.2",
     "@types/express": "^4.17.13",
     "@types/jsonwebtoken": "^8.5.8",
