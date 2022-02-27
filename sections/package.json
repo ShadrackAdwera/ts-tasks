@@ -1,24 +1,13 @@
 {
-  "name": "auth",
+  "name": "sections",
   "version": "1.0.0",
-  "description": "auth service",
+  "description": "sections service",
   "main": "index.js",
   "scripts": {
     "start": "ts-node-dev src/index.ts"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ShadrackAdwera/ts-tasks.git"
-  },
-  "keywords": [
-    "auth"
-  ],
   "author": "adwera",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/ShadrackAdwera/ts-tasks/issues"
-  },
-  "homepage": "https://github.com/ShadrackAdwera/ts-tasks#readme",
   "dependencies": {
     "@adwesh/common": "^1.0.18",
     "@adwesh/v2-common": "^1.0.5",
