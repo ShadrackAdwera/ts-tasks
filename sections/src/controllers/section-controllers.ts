@@ -6,15 +6,16 @@ import { Section } from '../models/Section';
 
 const newSection = async(req: Request, res: Response, next: NextFunction) => {
     const { name } = req.body;
+    const userId = req.user?.userId;
 
     const error = validationResult(req);
     if(!error.isEmpty()) {
         return next(new HttpError('Invalid inputs', 422));
     }
 
-    const newSection = new Section({ name });
+    const newSection = new Section({ name, createdBy: userId });
 
-    // publish to auth section DB??? We shall see . . . 
+    // TODO: publish to auth section DB??? We shall see . . . 
 
     try {
         await newSection.save();
@@ -34,6 +35,6 @@ const getSections = async(req: Request, res: Response, next: NextFunction) => {
     res.status(200).json({totalSections: allSections.length, sections: allSections});
 }
 
-// add update section and delete section controllers - to also publish events to section db in auth service.
+// TODO: add update section and delete section controllers - to also publish events to section db in auth service.
 
 export { getSections, newSection };
