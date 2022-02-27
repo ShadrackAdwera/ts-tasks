@@ -34,4 +34,6 @@ const getSections = async(req: Request, res: Response, next: NextFunction) => {
     res.status(200).json({totalSections: allSections.length, sections: allSections});
 }
 
+// add update section and delete section controllers - to also publish events to section db in auth service.
+
 export { getSections, newSection };
