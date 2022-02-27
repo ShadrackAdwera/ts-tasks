@@ -8,7 +8,7 @@ interface UserDoc extends Document {
     username: string;
     email: string;
     password: string;
-    company: string;
+    section: string;
     category: string;
     resetToken?: string,
     tokenExpirationDate?: Date,
@@ -20,7 +20,7 @@ interface UserModel extends Model<UserDoc> {
     username: string;
     email: string;
     password: string;
-    company: string;
+    section: string;
     category: string;
     resetToken?: string;
     tokenExpirationDate?: Date;
@@ -31,7 +31,7 @@ const userSchema = new Schema({
     username: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, required: true, min: 6 },
-    company: { type: Schema.Types.ObjectId, required: true, ref: 'company' },
+    section: { type: Schema.Types.ObjectId, required: true, ref: 'section' },
     category: { type: Schema.Types.ObjectId },
     resetToken: { type: String },
     tokenExpirationDate: { type: Date },

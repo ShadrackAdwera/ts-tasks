@@ -8,11 +8,11 @@ import jwt from 'jsonwebtoken';
 
 import { SectionCreatedPublisher } from '../events/publishers/section-created-publisher';
 import { User } from '../models/User';
-import { Company } from '../models/Company';
+import { Section } from '../models/Section';
 
-// to compare company name(s)
-const compareStrings = (requestCompanyName: string, dbCompanyName: string) => {
-    return requestCompanyName.trim().toLocaleLowerCase().split(' ').join('-') === dbCompanyName.trim().toLocaleLowerCase().split(' ').join('-');
+// to compare section name(s)
+const compareStrings = (requestSectionName: string, dbSectionName: string) => {
+    return requestSectionName.trim().toLocaleLowerCase().split(' ').join('-') === dbSectionName.trim().toLocaleLowerCase().split(' ').join('-');
 }
 
 // TODO: Create end point to add users to the section(s).
@@ -23,40 +23,40 @@ const signUp = async(req: Request, res: Response, next: NextFunction) => {
         return next(new HttpError('Invalid inputs', 422));
     }
     let foundUser;
-    let foundCompany;
+    let foundSection;
     let hashedPassword: string;
     let token: string;
-    const { username, email, password, company } = req.body;
+    const { username, email, password, section } = req.body;
 
     //check if email exists in the DB
     try {
-        foundUser = await User.findOne({email}).populate('company').exec();
+        foundUser = await User.findOne({email}).populate('section').exec();
     } catch (error) {
         return next(new HttpError('An error occured, try again', 500));
     }
     if(foundUser) {
         return next(new HttpError('Email exists, login instead', 400));
     }
-    //check if company exists in DB
+    //check if section exists in DB
     try {
-        foundCompany = await Company.findOne({company}).exec();
+        foundSection = await Section.findOne({section}).exec();
     } catch (error) {
         return next(new HttpError('An error occured, try again', 500));
     }
 
-    if(foundCompany) {
-        const companyNameResult = compareStrings(company, foundCompany.name);
-        if(companyNameResult) {
-            return next(new HttpError('This company name is taken', 422));
+    if(foundSection) {
+        const sectionNameResult = compareStrings(section, foundSection.name);
+        if(sectionNameResult) {
+            return next(new HttpError('This section name is taken', 422));
         }
     }
 
-    //create company in DB and publish event to company service
-    const newCompany = new Company({
-        name: company
+    //create section in DB and publish event to section service
+    const newSection = new Section({
+        name: section
     });
     try {
-        await newCompany.save();
+        await newSection.save();
     } catch (error) {
         return next(new HttpError('An error occured, try again', 500));
     }
@@ -73,7 +73,7 @@ const signUp = async(req: Request, res: Response, next: NextFunction) => {
         username, 
         email, 
         password: hashedPassword, 
-        company: newCompany, 
+        section: newSection, 
         roles: ['Admin'],
         resetToken: null,
         tokenExpirationDate: undefined
@@ -86,9 +86,9 @@ const signUp = async(req: Request, res: Response, next: NextFunction) => {
     }
 
     try {
-        newCompany.createdBy = newUser.id;
-        await newCompany.save();
-        await new SectionCreatedPublisher(natsWraper.client).publish({ id: newCompany.id, title: newCompany.name, createdBy: newUser.id });
+        newSection.createdBy = newUser.id;
+        await newSection.save();
+        await new SectionCreatedPublisher(natsWraper.client).publish({ id: newSection.id, title: newSection.name, createdBy: newUser.id });
     } catch (error) {
         return next(new HttpError('An error occured, try again', 500));
     }
@@ -99,7 +99,7 @@ const signUp = async(req: Request, res: Response, next: NextFunction) => {
         return next(new HttpError('An error occured, try again', 500));
     }
 
-    res.status(201).json({message: 'Sign Up successful', user: { id: newUser.id, email, company: newCompany.name ,token }});
+    res.status(201).json({message: 'Sign Up successful', user: { id: newUser.id, email, section: newSection.name ,token }});
 
 }
 
@@ -115,7 +115,7 @@ const login = async(req: Request, res: Response, next: NextFunction) => {
 
     //check if email exists in the DB
     try {
-        foundUser = await User.findOne({email}).populate('company').exec();
+        foundUser = await User.findOne({email}).populate('section').exec();
     } catch (error) {
         return next(new HttpError('An error occured, try again', 500));
     }
@@ -141,7 +141,7 @@ const login = async(req: Request, res: Response, next: NextFunction) => {
         return next(new HttpError('An error occured, try again', 500));
     }
 
-    //TODO: Add company name to response body.
+    //TODO: Add section name to response body.
     res.status(201).json({message: 'Login Successful', user: { id: foundUser.id, email, token, roles: foundUser.roles }})
 }
 

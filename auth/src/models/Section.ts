@@ -1,21 +1,21 @@
 import mongoose, { Schema, Model, Document } from 'mongoose';
 
-interface CompanyDoc extends Document {
+interface SectionDoc extends Document {
     name: string;
     createdBy: string;
     version: number;
 }
 
-interface CompanyModel extends Model<CompanyDoc> {
+interface SectionModel extends Model<SectionDoc> {
     name: string;
     createdBy: string;
 }
 
-const companySchema = new Schema({
+const sectionSchema = new Schema({
     name: { type: String, required: true },
     createdBy: { type: Schema.Types.ObjectId }
 }, { timestamps: true, toJSON: { getters: true } });
 
-const Company = mongoose.model<CompanyDoc, CompanyModel>('company', companySchema);
+const Section = mongoose.model<SectionDoc, SectionModel>('section', sectionSchema);
 
-export { Company };
+export { Section };
