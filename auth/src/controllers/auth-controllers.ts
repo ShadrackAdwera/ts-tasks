@@ -11,9 +11,9 @@ import { User } from '../models/User';
 import { Section } from '../models/Section';
 
 // to compare section name(s)
-const compareStrings = (requestSectionName: string, dbSectionName: string) => {
-    return requestSectionName.trim().toLocaleLowerCase().split(' ').join('-') === dbSectionName.trim().toLocaleLowerCase().split(' ').join('-');
-}
+// const compareStrings = (requestSectionName: string, dbSectionName: string) => {
+//     return requestSectionName.trim().toLocaleLowerCase().split(' ').join('-') === dbSectionName.trim().toLocaleLowerCase().split(' ').join('-');
+// }
 
 // TODO: Create end point to add users to the section(s).
 
@@ -23,7 +23,7 @@ const signUp = async(req: Request, res: Response, next: NextFunction) => {
         return next(new HttpError('Invalid inputs', 422));
     }
     let foundUser;
-    let foundSection;
+    //let foundSection;
     let hashedPassword: string;
     let token: string;
     const { username, email, password, section } = req.body;
@@ -38,18 +38,18 @@ const signUp = async(req: Request, res: Response, next: NextFunction) => {
         return next(new HttpError('Email exists, login instead', 400));
     }
     //check if section exists in DB
-    try {
-        foundSection = await Section.findOne({section}).exec();
-    } catch (error) {
-        return next(new HttpError('An error occured, try again', 500));
-    }
+    // try {
+    //     foundSection = await Section.findOne({section}).exec();
+    // } catch (error) {
+    //     return next(new HttpError('An error occured, try again', 500));
+    // }
 
-    if(foundSection) {
-        const sectionNameResult = compareStrings(section, foundSection.name);
-        if(sectionNameResult) {
-            return next(new HttpError('This section name is taken', 422));
-        }
-    }
+    // if(foundSection) {
+    //     const sectionNameResult = compareStrings(section, foundSection.name);
+    //     if(sectionNameResult) {
+    //         return next(new HttpError('This section name is taken', 422));
+    //     }
+    // }
 
     //create section in DB and publish event to section service
     const newSection = new Section({
