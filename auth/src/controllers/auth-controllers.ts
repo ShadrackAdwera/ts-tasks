@@ -15,6 +15,8 @@ const compareStrings = (requestCompanyName: string, dbCompanyName: string) => {
     return requestCompanyName.trim().toLocaleLowerCase().split(' ').join('-') === dbCompanyName.trim().toLocaleLowerCase().split(' ').join('-');
 }
 
+// TODO: Create end point to add users to the section(s).
+
 const signUp = async(req: Request, res: Response, next: NextFunction) => {
     const error = validationResult(req);
     if(!error.isEmpty()) {
@@ -80,6 +82,14 @@ const signUp = async(req: Request, res: Response, next: NextFunction) => {
 
     try {
         await newUser.save();
+    } catch (error) {
+        return next(new HttpError('An error occured, try again', 500));
+    }
+
+    try {
+        newCompany.createdBy = newUser.id;
+        await newCompany.save();
+        // TODO: Publish section updated event to sections service.
     } catch (error) {
         return next(new HttpError('An error occured, try again', 500));
     }
