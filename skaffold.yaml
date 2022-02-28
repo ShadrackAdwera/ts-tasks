@@ -32,5 +32,13 @@ build:
         manual:
           - dest: .
             src: 'src/**/*.ts'
+    - image: adwera/ts-tasks-tasks
+      context: tasks
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - dest: .
+            src: 'src/**/*.ts'
     
   
