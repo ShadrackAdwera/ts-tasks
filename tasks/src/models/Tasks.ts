@@ -28,7 +28,7 @@ const tasksModel = new Schema({
     category: { type: Schema.Types.ObjectId, required: true },
     image: { type: String },
     createdBy: { type: Schema.Types.ObjectId, required: true },
-    assignedTo: { type: Schema.Types.ObjectId, required: true }
+    assignedTo: { type: Schema.Types.ObjectId }
 }, { timestamps: true, toJSON: { getters: true } });
 
 tasksModel.set('versionKey','version');
