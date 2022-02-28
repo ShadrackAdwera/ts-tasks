@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: section-deployment
+  name: tasks-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: section
+      app: tasks
   template:
     metadata:
       labels:
-        app: section
+        app: tasks
     spec:
       containers:
-        - name: section
-          image: adwera/ts-tasks-section 
+        - name: tasks
+          image: adwera/ts-tasks-tasks 
           env:
             - name: MONGO_URI
-              value: 'mongodb://section-mongo-service:27017/section'
+              value: 'mongodb://tasks-mongo-service:27017/tasks'
             - name: NATS_CLUSTER_ID
               value: 'tasks'
             - name: NATS_CLIENT_ID
@@ -37,13 +37,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: section-service
+  name: tasks-service
 spec:
   selector:
-    app: section
+    app: tasks
   type: LoadBalancer
   ports:
-    - name: section
+    - name: tasks
       protocol: TCP
       port: 5002
       targetPort: 5002

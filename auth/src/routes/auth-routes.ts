@@ -10,7 +10,8 @@ router.post('/sign-up', [
     body('username').trim().not().isEmpty(),
     body('email').normalizeEmail().isEmail(),
     body('password').trim().isLength({ min: 6 }),
-    body('section').not().isEmpty().custom(input=>mongoose.Types.ObjectId.isValid(input))
+    body('section').not().isEmpty()
+    // body('section').not().isEmpty().custom(input=>mongoose.Types.ObjectId.isValid(input))
 ], signUp);
 
 router.post('/login', [
