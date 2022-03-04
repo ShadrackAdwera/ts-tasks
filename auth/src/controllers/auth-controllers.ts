@@ -7,15 +7,76 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken';
 
 import { SectionCreatedPublisher } from '../events/publishers/section-created-publisher';
-import { User } from '../models/User';
-import { Section } from '../models/Section';
+import { User, Section ,userRoles } from '../models/User';
 
+const DEFAULT_PASSWORD = '123456';
 // to compare section name(s)
 // const compareStrings = (requestSectionName: string, dbSectionName: string) => {
 //     return requestSectionName.trim().toLocaleLowerCase().split(' ').join('-') === dbSectionName.trim().toLocaleLowerCase().split(' ').join('-');
-// }
+// } 
 
-// TODO: Create end point to add users to the section(s).
+const addUsers = async(req: Request, res: Response, next: NextFunction) => {
+    const error = validationResult(req);
+    if(!error.isEmpty()) {
+        return next(new HttpError('Invalid inputs', 422));
+    }
+    let foundUser;
+    let foundSection;
+    let hashedPassword: string;
+    const { username, email, section, role, category } = req.body;
+
+    //check if email exists in the DB
+    try {
+        foundUser = await User.findOne({email}).populate('section').exec();
+    } catch (error) {
+        return next(new HttpError('An error occured, try again', 500));
+    }
+    if(foundUser) {
+        return next(new HttpError('Email exists!', 400));
+    }
+
+    //check if section exists in DB
+    try {
+        foundSection = await Section.findOne({section}).exec();
+    } catch (error) {
+        return next(new HttpError('An error occured, try again', 500));
+    }
+
+    if(!foundSection) {
+        return next(new HttpError('This section does not exist!', 404));
+    }
+
+    //hash password
+    try {
+        hashedPassword = await bcrypt.hash(DEFAULT_PASSWORD, 12);
+    } catch (error) {
+        return next(new HttpError('An error occured, try again', 500));
+    }
+
+    // create new user
+    const newUser = new User({
+        username, 
+        email, 
+        password: hashedPassword, 
+        section: foundSection, 
+        roles: [role],
+        resetToken: null,
+        tokenExpirationDate: undefined
+    });
+
+    try {
+        await newUser.save();
+        if(role===userRoles.Agent) {
+            newUser.category = category;
+            await newUser.save();
+            //publish to cron jobs service (userId, categoryId);
+        }
+    } catch (error) {
+        return next(new HttpError('An error occured, try again', 500));
+    }
+    res.status(201).json({message: 'User created'});
+
+ }
 
 const signUp = async(req: Request, res: Response, next: NextFunction) => {
     const error = validationResult(req);
@@ -219,4 +280,4 @@ const resetPassword = async(req: Request, res: Response, next: NextFunction) => 
     res.status(200).json({message: 'Password reset successful'});
  }
 
- export { signUp, login, requestPasswordReset, resetPassword };
+ export { signUp, login, requestPasswordReset, resetPassword, addUsers };
