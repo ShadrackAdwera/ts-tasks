@@ -40,5 +40,13 @@ build:
         manual:
           - dest: .
             src: 'src/**/*.ts'
+    - image: adwera/ts-tasks-cronjobs
+      context: cronjobs
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - dest: .
+            src: 'src/**/*.ts'
     
   
