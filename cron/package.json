@@ -1,0 +1,18 @@
+{
+  "name": "cron",
+  "version": "1.0.0",
+  "description": "run scheduled jobs to assign tasks to users based off their roles",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node-dev src/index.ts"
+  },
+  "author": "adwera",
+  "license": "ISC",
+  "dependencies": {
+    "@adwesh/common": "^1.0.19",
+    "node-cron": "^3.0.0",
+    "node-nats-streaming": "^0.3.2",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.6.2"
+  }
+}
