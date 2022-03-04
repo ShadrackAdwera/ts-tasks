@@ -35,5 +35,8 @@ router.post('/new-user',[
     body('role').trim().not().isEmpty(),
     body('section').not().isEmpty().custom(input=>mongoose.Types.ObjectId.isValid(input))
 ], addUsers);
+router.patch('/modify-user/:userId',[
+    body('userRole').trim().not().isEmpty(),
+], modifyUserRole);
 
 export { router as authRouter };
