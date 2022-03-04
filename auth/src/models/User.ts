@@ -27,6 +27,17 @@ interface UserModel extends Model<UserDoc> {
     roles: string[];
 }
 
+interface SectionDoc extends Document {
+    name: string;
+    createdBy: string;
+    version: number;
+}
+
+interface SectionModel extends Model<SectionDoc> {
+    name: string;
+    createdBy: string;
+}
+
 const userSchema = new Schema({
     username: { type: String, required: true },
     email: { type: String, required: true },
@@ -38,10 +49,18 @@ const userSchema = new Schema({
     roles: [ { type: String, enum: Object.keys(userRoles), default: userRoles.User } ]
 }, { timestamps: true, toJSON: { getters: true } } );
 
+const sectionSchema = new Schema({
+    name: { type: String, required: true },
+    createdBy: { type: Schema.Types.ObjectId }
+}, { timestamps: true, toJSON: { getters: true } });
+
 userSchema.set('versionKey', 'version');
 userSchema.plugin(updateIfCurrentPlugin);
+sectionSchema.set('versionKey', 'version');
+sectionSchema.plugin(updateIfCurrentPlugin);
 
-
+const Section = mongoose.model<SectionDoc, SectionModel>('section', sectionSchema);
 const User = mongoose.model<UserDoc, UserModel>('user', userSchema);
 
+export { Section };
 export {  User };
