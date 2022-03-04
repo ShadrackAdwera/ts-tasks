@@ -1,8 +1,9 @@
+import { checkAuth } from '@adwesh/common';
 import { body } from 'express-validator';
 import express from 'express';
 import mongoose from 'mongoose';
 
-import { signUp, login, requestPasswordReset, resetPassword } from '../controllers/auth-controllers';
+import { signUp, login, requestPasswordReset, resetPassword, modifyUserRole, addUsers } from '../controllers/auth-controllers';
 
 const router = express.Router();
 
@@ -26,5 +27,13 @@ router.patch('/request-reset-token', [
 router.patch('/reset-password/:resetToken', [
     body('password').trim().isLength({ min: 6 })
 ], resetPassword);
+
+router.use(checkAuth);
+router.post('/new-user',[
+    body('username').trim().not().isEmpty(),
+    body('email').normalizeEmail().isEmail(),
+    body('role').trim().not().isEmpty(),
+    body('section').not().isEmpty().custom(input=>mongoose.Types.ObjectId.isValid(input))
+], addUsers);
 
 export { router as authRouter };
