@@ -2,7 +2,7 @@ import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 import mongoose, { Schema, Model, Document } from 'mongoose';
 
 // handle this using the npm package
-enum userRoles { Admin='Admin', Agent='Agent', User='User' }
+export enum userRoles { Admin='Admin', Agent='Agent', User='User' }
 
 interface UserDoc extends Document {
     username: string;
