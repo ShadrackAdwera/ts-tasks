@@ -280,4 +280,40 @@ const resetPassword = async(req: Request, res: Response, next: NextFunction) => 
     res.status(200).json({message: 'Password reset successful'});
  }
 
- export { signUp, login, requestPasswordReset, resetPassword, addUsers };
+ const modifyUserRole = async(req: Request, res: Response, next: NextFunction) => { 
+    const error = validationResult(req);
+    if(!error.isEmpty()) {
+        return next(new HttpError('Invalid inputs', 422));
+    }
+    let foundUser;
+    const { email, userRole } = req.body;
+
+    //check if email exists in the DB
+    try {
+        foundUser = await User.findOne({email}).populate('section').exec();
+    } catch (error) {
+        return next(new HttpError('An error occured, try again', 500));
+    }
+    if(!foundUser) {
+        return next(new HttpError('This user does not exist!', 404));
+    }
+
+    const isAgent = foundUser.roles.find(role=>(role===userRoles.Agent || role===userRoles.Admin || role===userRoles.User));
+    if(isAgent) {
+        if(isAgent===userRole) {
+            return next(new HttpError('This user has the role provided', 400));
+        }
+    }
+    foundUser.roles.push(userRole);
+    try {
+        await foundUser.save();
+        if(userRole===userRoles.Agent) {
+            //publish update userRole event to cron jobs service
+        }
+    } catch (error) {
+        return next(new HttpError('An error occured, try again', 500));
+    }
+    res.status(201).json({message: `${userRole} role has been added to ${foundUser.username}'s roles`});
+}
+
+ export { signUp, login, requestPasswordReset, resetPassword, addUsers, modifyUserRole };
