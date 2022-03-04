@@ -286,11 +286,12 @@ const resetPassword = async(req: Request, res: Response, next: NextFunction) => 
         return next(new HttpError('Invalid inputs', 422));
     }
     let foundUser;
-    const { email, userRole } = req.body;
+    const { userRole } = req.body;
+    const userId = req.params.userId;
 
     //check if email exists in the DB
     try {
-        foundUser = await User.findOne({email}).populate('section').exec();
+        foundUser = await User.findById(userId).populate('section').exec();
     } catch (error) {
         return next(new HttpError('An error occured, try again', 500));
     }
