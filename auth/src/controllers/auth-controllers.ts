@@ -5,8 +5,8 @@ import { validationResult } from 'express-validator';
 import { natsWraper } from '@adwesh/common';
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken';
-
 import { SectionCreatedPublisher } from '../events/publishers/section-created-publisher';
+import { UserCreatedPublisher } from '../events/publishers/user-created-publisher';
 import { User, Section ,userRoles } from '../models/User';
 
 const DEFAULT_PASSWORD = '123456';
@@ -70,6 +70,7 @@ const addUsers = async(req: Request, res: Response, next: NextFunction) => {
             newUser.category = category;
             await newUser.save();
             //publish to cron jobs service (userId, categoryId);
+            await new UserCreatedPublisher(natsWraper.client).publish({ id: newUser.id, email: newUser.email, category: newUser.category });
         }
     } catch (error) {
         return next(new HttpError('An error occured, try again', 500));
