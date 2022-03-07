@@ -42,4 +42,8 @@ const taskSchema = new Schema({
     assignedTo: { type: Schema.Types.ObjectId, required: true }
 }, { timestamps: true, toJSON: { getters: true } });
 
-
+const userSchema = new Schema({
+    userId: { type: Schema.Types.ObjectId, required: true },
+    email: { type: String, required: true },
+    category: { type: Schema.Types.ObjectId, required: true, ref: 'category' }
+});
