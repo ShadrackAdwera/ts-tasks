@@ -1,6 +1,8 @@
 import { Schema, Document, Model, model } from 'mongoose';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 
 enum taskStatus { pending='Pending', complete='Complete', cancelled='Cancelled' };
+enum priorities { high='high', medium='medium', low='low' }
 
 interface TaskDoc extends Document {
     taskId: string;
@@ -35,6 +37,12 @@ interface CategoryDoc extends Document {
     priority: string;
 }
 
+interface CategoryModel extends Model<CategoryDoc> {
+    categoryId: string;
+    title: string;
+    priority: string;
+}
+
 const taskSchema = new Schema({
     taskId: { type: Schema.Types.ObjectId, required: true },
     category: { type: Schema.Types.ObjectId, required: true, ref: 'category' },
@@ -47,3 +55,10 @@ const userSchema = new Schema({
     email: { type: String, required: true },
     category: { type: Schema.Types.ObjectId, required: true, ref: 'category' }
 });
+
+const categorySchema = new Schema({
+    categoryId: { type: Schema.Types.ObjectId, required: true },
+    title: { type: String, required: true },
+    priority: { type: String, required: true, enum: Object.values(priorities) }
+});
+
