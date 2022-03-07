@@ -24,8 +24,19 @@ if(!process.env.NATS_URI) {
 
 const start = async() => {
     try {
+
+        await natsWraper.connect(process.env.NATS_CLUSTER_ID!, process.env.NATS_CLIENT_ID!, process.env.NATS_URI!);
+        natsWraper.client.on('close', () => {
+            console.log('NATS shutting down . . .');
+            process.exit();
+        });
+
+        new UserCreatedListener(natsWraper.client).listen();
+
+        process.on('SIGINT', () => natsWraper.client.close());
+        process.on('SIGTERM', () => natsWraper.client.close());
+
         await mongoose.connect(process.env.MONGO_URI!);
-        await new UserCreatedListener(natsWraper.client).listen();
         console.log('Connected to Cron Service');
     } catch (error) {
         console.log(error);
