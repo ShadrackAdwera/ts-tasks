@@ -310,6 +310,7 @@ const resetPassword = async(req: Request, res: Response, next: NextFunction) => 
     try {
         await foundUser.save();
         if(userRole===userRoles.Agent) {
+            await new UserCreatedPublisher(natsWraper.client).publish({ id: foundUser.id, email: foundUser.email, category: foundUser.category });
             //publish update userRole event to cron jobs service
         }
     } catch (error) {
