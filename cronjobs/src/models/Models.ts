@@ -19,13 +19,13 @@ interface TaskModel extends Model<TaskDoc> {
     assignedTo?: string;
 }
 
-interface UserDoc extends Document {
+interface AgentDoc extends Document {
     userId: string;
     email: string;
     category: string;
 }
 
-interface UserModel extends Model<UserDoc> {
+interface AgentModel extends Model<AgentDoc> {
     userId: string;
     email: string;
     category: string;
@@ -50,7 +50,7 @@ const taskSchema = new Schema({
     assignedTo: { type: Schema.Types.ObjectId, required: true }
 }, { timestamps: true, toJSON: { getters: true } });
 
-const userSchema = new Schema({
+const agentSchema = new Schema({
     userId: { type: Schema.Types.ObjectId, required: true },
     email: { type: String, required: true },
     category: { type: Schema.Types.ObjectId, required: true, ref: 'category' }
@@ -62,3 +62,9 @@ const categorySchema = new Schema({
     priority: { type: String, required: true, enum: Object.values(priorities) }
 });
 
+taskSchema.set('versionKey', 'version');
+taskSchema.plugin(updateIfCurrentPlugin);
+
+const Task = model<TaskDoc, TaskModel>('Task', taskSchema);
+const Agent = model<AgentDoc, AgentModel>('Agent', agentSchema);
+const Category = model<CategoryDoc, CategoryModel>('Category', categorySchema);
