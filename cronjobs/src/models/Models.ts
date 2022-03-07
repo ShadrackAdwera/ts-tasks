@@ -68,3 +68,5 @@ taskSchema.plugin(updateIfCurrentPlugin);
 const Task = model<TaskDoc, TaskModel>('Task', taskSchema);
 const Agent = model<AgentDoc, AgentModel>('Agent', agentSchema);
 const Category = model<CategoryDoc, CategoryModel>('Category', categorySchema);
+
+export { Task, Agent, Category };
