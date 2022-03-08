@@ -36,7 +36,8 @@ const createTask = async(req: Request, res: Response, next: NextFunction) => {
              image: newTask.image,
              createdBy: newTask.createdBy,
              assignedTo: undefined,
-             status: taskStatus.pending
+             status: taskStatus.pending,
+             version: newTask.version
          })
      } catch (error) {
          
