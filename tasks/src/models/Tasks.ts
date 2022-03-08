@@ -1,7 +1,7 @@
 import { Schema, Document, Model, model } from 'mongoose';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 
-enum taskStatus { pending='Pending', complete='Complete', cancelled='Cancelled' };
+export enum taskStatus { pending='Pending', complete='Complete', cancelled='Cancelled' };
 
 interface TasksDoc extends Document {
     title: string;

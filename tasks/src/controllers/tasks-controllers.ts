@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
-import { HttpError } from '@adwesh/common';
+import { HttpError,natsWraper } from '@adwesh/common';
 
-import { Task } from '../models/Tasks';
+import { Task, taskStatus } from '../models/Tasks';
+import { TaskCreatedPublisher } from '../events/publishers/task-created-publisher';
 
 const createTask = async(req: Request, res: Response, next: NextFunction) => {
     const error = validationResult(req);
@@ -12,7 +13,13 @@ const createTask = async(req: Request, res: Response, next: NextFunction) => {
     const userId = <string>req.user?.userId;
     const { title, description, category, image } = req.body;
 
-    const newTask = new Task({ title, description, category, image, createdBy: userId, assignedTo: undefined, status: 'Pending' });
+    const newTask = new Task({ title, 
+        description, 
+        category, 
+        image, 
+        createdBy: userId, 
+        assignedTo: undefined, 
+        status: taskStatus.pending });
 
     try {
         await newTask.save();
@@ -20,7 +27,20 @@ const createTask = async(req: Request, res: Response, next: NextFunction) => {
         return next(new HttpError('An error occured, try again', 500));
     }
 
-    //TODO: publish new task created to scheduler service
+     try {
+         await new TaskCreatedPublisher(natsWraper.client).publish({
+             id: newTask.id,
+             title: newTask.title,
+             description: newTask.description,
+             category: newTask.category,
+             image: newTask.image,
+             createdBy: newTask.createdBy,
+             assignedTo: undefined,
+             status: taskStatus.pending
+         })
+     } catch (error) {
+         
+     }
     res.status(201).json({message: 'New task created', task: newTask});
 
 }
@@ -41,7 +61,7 @@ const getPendingTasks = async(req: Request, res: Response, next: NextFunction) =
     let foundTasks;
     let userId = <string>req.user?.userId;
     try {
-        foundTasks = await Task.find({createdBy: userId, status: 'Pending'}).exec();
+        foundTasks = await Task.find({createdBy: userId, status: taskStatus.pending}).exec();
     } catch (error) {
         return next(new HttpError('An error occured, try again', 500));
     }
