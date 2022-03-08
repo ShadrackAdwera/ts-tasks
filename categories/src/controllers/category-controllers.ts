@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
-import { HttpError } from '@adwesh/common';
+import { HttpError, natsWraper } from '@adwesh/common';
 
 import { Category } from '../models/Category';
+import { CategoryCreatedPublisher } from '../events/publisher/category-created-event';
 
 const createCategory = async(req: Request, res: Response, next: NextFunction) => {
     const error = validationResult(req);
@@ -18,6 +19,13 @@ const createCategory = async(req: Request, res: Response, next: NextFunction) =>
     try {
         await newCategory.save();
         // publish event to tasks service
+        await new CategoryCreatedPublisher(natsWraper.client).publish({
+            id: newCategory.id,
+            title: newCategory.title,
+            description: newCategory.description,
+            priority: newCategory.priority,
+            version: newCategory.version
+        });
     } catch (error) {
         return next(new HttpError('An error occured, try again', 500));
     }
