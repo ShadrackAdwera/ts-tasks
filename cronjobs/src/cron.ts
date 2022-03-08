@@ -1,5 +1,6 @@
-import { HttpError } from '@adwesh/common';
+import { HttpError, natsWraper } from '@adwesh/common';
 import cron from 'node-cron';
+import { TaskUpdatedPublisher } from './events/publishers/task-assigned-event';
 import { Task, Agent } from './models/Models';
 import { taskStatus } from './utils/enums';
 
@@ -29,7 +30,13 @@ export const handleCronJobs = () => {
              }
              foundTask.assignedTo = foundUser.id;
              await foundTask.save();
-             //notify user via email of assigned task;
+             await new TaskUpdatedPublisher(natsWraper.client).publish({
+                 taskId: foundTask.id,
+                 category: foundTask.category,
+                 status: foundTask.status,
+                 assignedTo: foundUser.id,
+                 version: foundTask.version
+             });
         }
         return;
     });
