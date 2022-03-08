@@ -12,6 +12,7 @@ export class TaskCreatedListener extends Listener<TaskCreated> {
             const newTask = new Task({
                 taskId: id, category, status, assignedTo: undefined, version});
                 await newTask.save();
+                msg.ack();
         } catch (error) {
             throw new Error(<string>error);
         }
