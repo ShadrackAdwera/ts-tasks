@@ -3,6 +3,7 @@ import { natsWraper } from '@adwesh/common';
 import { UserCreatedListener } from './events/listeners/user-created-event';
 import { TaskCreatedListener } from './events/listeners/task-created-event';
 import { handleCronJobs } from './cron';
+import { CategoryCreatedListener } from './events/listeners/category-created-event';
 
 if(!process.env.JWT_KEY) {
     throw new Error('JWT is not defined!');
@@ -35,6 +36,7 @@ const start = async() => {
 
         new UserCreatedListener(natsWraper.client).listen();
         new TaskCreatedListener(natsWraper.client).listen();
+        new CategoryCreatedListener(natsWraper.client).listen();
 
         process.on('SIGINT', () => natsWraper.client.close());
         process.on('SIGTERM', () => natsWraper.client.close());
